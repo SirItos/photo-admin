@@ -1,0 +1,45 @@
+.border-4 {
+  border-radius: 4px;
+}
+
+.primary--text,
+.error--text {
+  .v-icon {
+    opacity: 1 !important;
+  }
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s;
+}
+.page-enter,
+.page-leave-active {
+  opacity: 0;
+}
+.page-enter {
+  transform: translateX(10px);
+}
+
+.page-leave-active {
+  transform: translateX(-10px);
+}
+
+.layout-enter-active,
+.layout-leave-active {
+  transition: all 0.3s;
+}
+.layout-enter,
+.layout-leave-active {
+  opacity: 0;
+}
+.layout-enter {
+  transform: translateX(10px);
+}
+
+.layout-leave-active {
+  transform: translateX(-10px);
+}
+.theme--light.v-icon {
+  opacity: 1 !important;
+}
