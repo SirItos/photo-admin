@@ -1,7 +1,8 @@
 <template>
   <v-app>
-    <v-app-bar></v-app-bar>
-    <!-- permanent -->
+    <v-app-bar app color="white" class="elevation-0">
+      <v-toolbar-title>{{$store.state.global.header}}</v-toolbar-title>
+    </v-app-bar>
     <v-navigation-drawer
       v-model="drawler"
       class="white--text"
@@ -11,13 +12,13 @@
       expand-on-hover
       mini-variant
     >
-      <v-list nav class="py-0">
+      <v-list nav class="pa-0">
         <p-avatar
           :name="$store.state.user.name"
           :role="$store.state.user.role"
           :user_id="$store.state.user.id"
         />
-        <v-list-item nuxt link v-ripple="{class:'white--text'}">
+        <v-list-item @click="logout" link v-ripple="{class:'white--text'}" class="nav-padding-b">
           <v-list-item-icon>
             <v-icon class="white--text">mdi-logout</v-icon>
           </v-list-item-icon>
@@ -29,35 +30,59 @@
         <p-navigator-list v-for="item in items" :key="item.title" :item="item" />
       </v-list>
     </v-navigation-drawer>
+    <v-content style="background-color:rgba(255,255,255)">
+      <nuxt />
+    </v-content>
+    <v-dialog
+      :value="visibility"
+      max-width="400"
+      @click:outside="$store.dispatch('dialog/setDialogParams',{})"
+      style="z-index:1200"
+    >
+      <dialog-content />
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+import { logoutMixin } from '@/mixins'
+
 export default {
   middleware: 'checkRole',
   components: {
     'p-avatar': () => import('@/components/AppAvatarComponent'),
-    'p-navigator-list': () => import('@/components/AppNavigationList')
+    'p-navigator-list': () => import('@/components/AppNavigationList'),
+    'dialog-content': () => import('@/components/DialogComponent')
   },
+  mixins: [logoutMixin],
   data: () => ({
     drawler: true,
     items: [
       {
         title: 'Пользователи',
         icon: 'mdi-account-outline',
-        to: null
+        to: '/users'
       },
       {
         title: 'Анкеты',
         icon: 'mdi-clipboard-list-outline',
-        to: null
+        to: '/profiles',
+        target: 'resources'
       },
       {
         title: 'Сообщения',
         icon: 'mdi-message-alert-outline',
-        to: null
+        to: '/messages',
+        target: 'feedback'
       }
     ]
-  })
+  }),
+  computed: {
+    ...mapState('dialog', ['visibility'])
+  },
+  methods: {
+    ...mapActions('dialog', ['setDialogParams'])
+  }
 }
 </script>

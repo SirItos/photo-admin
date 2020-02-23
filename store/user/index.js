@@ -14,13 +14,16 @@ export const actions = {
           maxAge: 60 * 60 * 2
         })
         console.log('auth done')
-        $nuxt.$router.push('/')
+        $nuxt.$router.push('/profiles')
       })
       .catch(e => {
         console.log(e)
       })
   },
-  logout({ commit, dispatch }) {},
+  logout({ commit }) {
+    this.$cookies.removeAll()
+    commit('LOG_OUT')
+  },
 
   async getUserParams({ dispatch, commit }, payload) {
     await this.$axios
@@ -39,5 +42,8 @@ export const mutations = {
     state.id = payload.id
     state.name = payload.user_details ? payload.user_details.name : null
     state.role = payload.roles[0].name
+  },
+  LOG_OUT(state) {
+    ;(state.id = null), (state.name = null), (state.role = null)
   }
 }

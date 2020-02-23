@@ -5,12 +5,27 @@
         <nuxt />
       </v-container>
     </v-content>
+    <v-dialog
+      :value="visibility"
+      @click:outside="$store.dispatch('dialog/setDialogParams',{})"
+      style="z-index:1200"
+    >
+      <dialog-content />
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 export default {
   name: 'authLayout',
-  data: () => ({})
+  components: {
+    'dialog-content': () => import('@/components/DialogComponent')
+  },
+  data: () => ({}),
+  computed: {
+    ...mapState('dialog', ['visibility'])
+  }
 }
 </script>

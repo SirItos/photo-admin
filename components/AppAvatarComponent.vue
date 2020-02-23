@@ -1,5 +1,5 @@
 <template>
-  <v-list-item two-line class="px-0">
+  <v-list-item link two-line class v-ripple="{class:'white--text'}">
     <v-list-item-avatar color="white" class="primary--text">{{initial}}</v-list-item-avatar>
 
     <v-list-item-content class="white--text">
