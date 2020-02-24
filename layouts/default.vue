@@ -60,11 +60,6 @@ export default {
     drawler: true,
     items: [
       {
-        title: 'Пользователи',
-        icon: 'mdi-account-outline',
-        to: '/users'
-      },
-      {
         title: 'Анкеты',
         icon: 'mdi-clipboard-list-outline',
         to: '/profiles',
@@ -75,6 +70,11 @@ export default {
         icon: 'mdi-message-alert-outline',
         to: '/messages',
         target: 'feedback'
+      },
+      {
+        title: 'Пользователи',
+        icon: 'mdi-account-outline',
+        to: '/users'
       }
     ]
   }),

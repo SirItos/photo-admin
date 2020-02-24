@@ -15,7 +15,7 @@ export default {
     }
   },
   lang: {
-    locale: { ru },
+    locales: { ru },
     current: 'ru'
   }
 }

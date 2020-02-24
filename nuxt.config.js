@@ -28,7 +28,10 @@ export default {
 
   plugins: [{ src: '~/plugins/axios.js' }],
 
-  buildModules: ['@nuxtjs/vuetify'],
+  buildModules: [
+    '@nuxtjs/vuetify',
+    ['@nuxtjs/moment', { locales: ['ru'], defaultLocale: 'ru' }]
+  ],
 
   modules: ['@nuxtjs/axios', 'cookie-universal-nuxt'],
 
