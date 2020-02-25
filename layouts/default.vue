@@ -2,6 +2,9 @@
   <v-app>
     <v-app-bar app color="white" class="elevation-0">
       <v-toolbar-title>{{$store.state.global.header}}</v-toolbar-title>
+      <!-- <v-toolbar-title>
+        <v-breadcrumbs :items="bread"></v-breadcrumbs>
+      </v-toolbar-title>-->
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawler"
