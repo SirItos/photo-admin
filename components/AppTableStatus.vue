@@ -1,11 +1,12 @@
 <template >
   <span
+    style="text-transform: capitalize;"
     :class="{
-    'new_item':!status,
-    'primary':!status
+    'new_item':status==='новый',
+    'primary':status==='новый'
   }"
     class="py-2 px-4"
-  >{{statusToHumanView}}</span>
+  >{{status}}</span>
 </template>
 
 <script>
@@ -13,7 +14,7 @@ export default {
   name: 'AppTableStatus',
   props: {
     status: {
-      type: Number,
+      type: String,
       default: 0
     }
   },
