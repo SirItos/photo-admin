@@ -28,7 +28,7 @@
         item-key="id"
         show-select
       >
-        <template v-slot:body="{ items,isSelected, select }">
+        <!-- <template v-slot:body="{ items,isSelected, select }">
           <tbody style="cursor:pointer">
             <tr v-for="item in items" :key="item.id">
               <td>
@@ -45,13 +45,52 @@
               </td>
             </tr>
           </tbody>
-        </template>
-        <!-- <template
+        </template>-->
+        <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
         <template v-slot:item.status="{ item }">
           <b-table-status :status="item.statustitle.status_title" />
-        </template>-->
+        </template>
+        <template v-slot:item.action="{ item }">
+          <div class="d-flex justify-center">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-btn small text icon v-on="on" class="mr-2" @click="check(item)">
+                  <v-icon small>mdi-pencil</v-icon>
+                </v-btn>
+              </template>
+              <span>Проверить</span>
+            </v-tooltip>
+
+            <v-menu offset-y>
+              <template v-slot:activator="{ on: menu }">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on: tooltip }">
+                    <v-btn small icon text v-on="{ ...tooltip, ...menu }">
+                      <v-icon small>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>меню</span>
+                </v-tooltip>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(listItem, index) in menuListPrepare(item.status)"
+                  :key="index"
+                  @click="menuAction(listItem.actions,item)"
+                >
+                  <v-list-item-title>{{ listItem.label }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <!-- <v-btn small icon text>
+              <v-icon small>mdi-dots-vertical</v-icon>
+            </v-btn>-->
+          </div>
+          <!-- <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon> -->
+          <!-- <v-icon small @click="deleteItem(item)">mdi-trash</v-icon> -->
+        </template>
       </v-data-table>
     </v-col>
   </v-row>
@@ -113,8 +152,6 @@ export default {
     total: 0,
     loading: false,
     options: {
-      // sortBy: ['created_at'],
-      // sortDesc: [true],
       itemsPerPage: 15
     },
     headers: [
@@ -142,6 +179,12 @@ export default {
         value: 'status',
         align: 'center',
         sortable: true
+      },
+      {
+        text: 'Действия',
+        value: 'action',
+        align: 'center',
+        sortable: false
       }
     ],
     items: []
@@ -166,9 +209,6 @@ export default {
   methods: {
     fillSelected(arr) {
       this.selected = arr
-    },
-    clickRow(val) {
-      console.log(val)
     },
     searching() {
       if (!this.wait) {
@@ -214,6 +254,58 @@ export default {
         search: this.search
       })
       this.$router.push({ query: query })
+    },
+
+    menuListPrepare(status) {
+      return status === 3
+        ? [
+            {
+              label: 'Просмортреть',
+              actions: 'check'
+            },
+            {
+              label: 'Активировать',
+              actions: 'activate'
+            }
+          ]
+        : status === 2
+        ? [
+            {
+              label: 'Просмортреть',
+              actions: 'check'
+            },
+            {
+              label: 'Отклонить',
+              actions: 'deactivate'
+            }
+          ]
+        : [
+            {
+              label: 'Просмортреть',
+              actions: 'check'
+            },
+            {
+              label: 'Активировать',
+              actions: 'activate'
+            },
+            {
+              label: 'Отклонить',
+              actions: 'deactivate'
+            }
+          ]
+    },
+    menuAction(action, payload) {
+      if (!action) return
+      this[action](payload)
+    },
+    check(payload) {
+      this.$router.push(`/profiles/check/${payload.id}`)
+    },
+    activate(payload) {
+      console.log(payload)
+    },
+    deactivate(payload) {
+      console.log(payload)
     }
   }
 }

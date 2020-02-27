@@ -13,7 +13,6 @@ export const actions = {
           path: '/',
           maxAge: 60 * 60 * 2
         })
-        console.log('auth done')
         $nuxt.$router.push('/profiles')
       })
       .catch(e => {
