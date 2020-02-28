@@ -14,6 +14,7 @@
         </v-row>
       </div>
       <v-data-table
+        ref="table"
         @input="fillSelected"
         :headers="headers"
         :items="items"
@@ -28,24 +29,6 @@
         item-key="id"
         show-select
       >
-        <!-- <template v-slot:body="{ items,isSelected, select }">
-          <tbody style="cursor:pointer">
-            <tr v-for="item in items" :key="item.id">
-              <td>
-                <v-simple-checkbox :value="isSelected(item)" @input="select(item, $event)"></v-simple-checkbox>
-              </td>
-              <td @dblclick="clickRow(item.id)" class="text-center">{{ item.id }}</td>
-              <td @dblclick="clickRow(item.id)" class="text-center">{{ item.title }}</td>
-              <td
-                @dblclick="clickRow(item.id)"
-                class="text-center"
-              >{{$moment(item.created_at).format('DD/MM/YYYY')}}</td>
-              <td @dblclick="clickRow(item.id)" class="text-center">
-                <b-table-status :status="item.statustitle.status_title" />
-              </td>
-            </tr>
-          </tbody>
-        </template>-->
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
@@ -56,7 +39,7 @@
           <div class="d-flex justify-center">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn small text icon v-on="on" class="mr-2" @click="check(item)">
+                <v-btn small text icon v-on="on" class="mr-2" @click="check([item])">
                   <v-icon small>mdi-pencil</v-icon>
                 </v-btn>
               </template>
@@ -78,20 +61,28 @@
                 <v-list-item
                   v-for="(listItem, index) in menuListPrepare(item.status)"
                   :key="index"
-                  @click="menuAction(listItem.actions,item)"
+                  @click="menuAction(listItem.actions,[item], listItem.status)"
                 >
                   <v-list-item-title>{{ listItem.label }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
-            <!-- <v-btn small icon text>
-              <v-icon small>mdi-dots-vertical</v-icon>
-            </v-btn>-->
           </div>
-          <!-- <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon> -->
-          <!-- <v-icon small @click="deleteItem(item)">mdi-trash</v-icon> -->
         </template>
       </v-data-table>
+      <v-expand-transition>
+        <div class="d-felx col-4 dropdown py-0" v-if="selected.length" key="actions_btn">
+          <v-overflow-btn
+            :items="dropdown_icon"
+            background-color="primary"
+            color="white"
+            class="text--white text-none"
+            value="activate"
+            segmented
+            target="#dropdown-example"
+          ></v-overflow-btn>
+        </div>
+      </v-expand-transition>
     </v-col>
   </v-row>
 </template>
@@ -143,7 +134,7 @@ export default {
   components: {
     'b-table-status': () => import('@/components/AppTableStatus')
   },
-  data: () => ({
+  data: vm => ({
     search: null,
     wait: false,
     page_mounted: false,
@@ -187,12 +178,23 @@ export default {
         sortable: false
       }
     ],
-    items: []
+    items: [],
+    dropdown_icon: [
+      {
+        text: 'Активировать',
+        value: 'activate',
+        callback: () => vm.activate(vm.selected, 2)
+      },
+      {
+        text: 'Отклонить',
+        value: 'deactivate',
+        callback: () => vm.deactivate(vm.selected, 3)
+      }
+    ]
   }),
   watch: {
     options: {
       handler() {
-        console.log(this.options)
         if (!this.page_mounted) return
         this.loadApiData()
       }
@@ -261,57 +263,113 @@ export default {
         ? [
             {
               label: 'Просмортреть',
-              actions: 'check'
+              actions: 'check',
+              status: 1
             },
             {
               label: 'Активировать',
-              actions: 'activate'
+              actions: 'activate',
+              status: 2
             }
           ]
         : status === 2
         ? [
             {
               label: 'Просмортреть',
-              actions: 'check'
+              actions: 'check',
+              status: 1
             },
             {
               label: 'Отклонить',
-              actions: 'deactivate'
+              actions: 'deactivate',
+              status: 3
             }
           ]
         : [
             {
               label: 'Просмортреть',
-              actions: 'check'
+              actions: 'check',
+              status: 1
             },
             {
               label: 'Активировать',
-              actions: 'activate'
+              actions: 'activate',
+              status: 2
             },
             {
               label: 'Отклонить',
-              actions: 'deactivate'
+              actions: 'deactivate',
+              status: 3
             }
           ]
     },
-    menuAction(action, payload) {
+    menuAction(action, payload, status) {
       if (!action) return
-      this[action](payload)
+      this[action](payload, status)
     },
     check(payload) {
-      this.$router.push(`/profiles/check/${payload.id}`)
+      this.$router.push(`/profiles/check/${payload[0].id}`)
     },
-    activate(payload) {
-      console.log(payload)
+    async activate(payload, status) {
+      this.loading = true
+      await this.$axios
+        .post('/admin/resource/status', {
+          resources: this.payloadStatusCreate(payload),
+          status: status
+        })
+        .then(response => {
+          this.changeItemsStauts(response.data.resources)
+          this.loading = false
+        })
+        .catch(e => {
+          this.loading = false
+        })
     },
-    deactivate(payload) {
-      console.log(payload)
+    async deactivate(payload, status) {
+      this.loading = true
+      await this.$axios
+        .post('/admin/resource/status', {
+          resources: this.payloadStatusCreate(payload),
+          status: status
+        })
+        .then(response => {
+          this.changeItemsStauts(response.data.resources)
+          this.loading = false
+        })
+        .catch(e => {
+          this.loading = false
+        })
+    },
+    payloadStatusCreate(resources) {
+      return resources.map(item => {
+        return item.id
+      })
+    },
+    changeItemsStauts(arr) {
+      arr.forEach(res => {
+        try {
+          let newItem = this.items.find(item => {
+            return item.id === res.id
+          })
+          newItem.status = res.status
+          newItem.statustitle = res.statustitle
+        } catch (error) {
+          console.log('error then update table')
+        }
+      })
+      this.selected = []
+      this.$refs.table.$data.selection = {}
     }
   }
 }
-//  query (params) {
-//       let query = Object.assign({}, this.$route.query, params)
-//       this.$router.push({ query: query })
-//       this.get(query)
-//     }
 </script>
+
+<style lang="scss">
+.dropdown {
+  .v-btn__content,
+  i.v-icon {
+    color: white !important;
+    text-transform: capitalize;
+  }
+}
+</style>
