@@ -1,7 +1,8 @@
 export const state = () => ({
   id: null,
   role: null,
-  name: null
+  name: null,
+  error: false
 })
 
 export const actions = {
@@ -9,6 +10,7 @@ export const actions = {
     await this.$axios
       .post('/auth', Object.assign(payload, { type: 'login' }))
       .then(response => {
+        commit('SET_ERROR', false)
         this.$cookies.set('access_token', response.data.access_token, {
           path: '/',
           maxAge: 60 * 60 * 2
@@ -17,6 +19,7 @@ export const actions = {
       })
       .catch(e => {
         console.log(e)
+        commit('SET_ERROR', true)
       })
   },
   logout({ commit }) {
@@ -44,5 +47,8 @@ export const mutations = {
   },
   LOG_OUT(state) {
     ;(state.id = null), (state.name = null), (state.role = null)
+  },
+  SET_ERROR(state, payload) {
+    state.error = payload
   }
 }

@@ -71,7 +71,7 @@
         </template>
       </v-data-table>
       <v-expand-transition>
-        <div class="d-felx col-4 dropdown py-0" v-if="selected.length" key="actions_btn">
+        <v-col xs="12" sm="4" class="d-felx dropdown py-0" v-if="selected.length" key="actions_btn">
           <v-overflow-btn
             :items="dropdown_icon"
             background-color="primary"
@@ -81,7 +81,7 @@
             segmented
             target="#dropdown-example"
           ></v-overflow-btn>
-        </div>
+        </v-col>
       </v-expand-transition>
     </v-col>
   </v-row>
@@ -183,12 +183,12 @@ export default {
       {
         text: 'Активировать',
         value: 'activate',
-        callback: () => vm.activate(vm.selected, 2)
+        callback: () => vm.prompt(vm.selected, 2)
       },
       {
         text: 'Отклонить',
         value: 'deactivate',
-        callback: () => vm.deactivate(vm.selected, 3)
+        callback: () => vm.prompt(vm.selected, 3)
       }
     ]
   }),
@@ -268,7 +268,7 @@ export default {
             },
             {
               label: 'Активировать',
-              actions: 'activate',
+              actions: 'prompt',
               status: 2
             }
           ]
@@ -281,7 +281,7 @@ export default {
             },
             {
               label: 'Отклонить',
-              actions: 'deactivate',
+              actions: 'prompt',
               status: 3
             }
           ]
@@ -293,12 +293,12 @@ export default {
             },
             {
               label: 'Активировать',
-              actions: 'activate',
+              actions: 'prompt',
               status: 2
             },
             {
               label: 'Отклонить',
-              actions: 'deactivate',
+              actions: 'prompt',
               status: 3
             }
           ]
@@ -310,22 +310,20 @@ export default {
     check(payload) {
       this.$router.push(`/profiles/check/${payload[0].id}`)
     },
-    async activate(payload, status) {
-      this.loading = true
-      await this.$axios
-        .post('/admin/resource/status', {
-          resources: this.payloadStatusCreate(payload),
-          status: status
-        })
-        .then(response => {
-          this.changeItemsStauts(response.data.resources)
-          this.loading = false
-        })
-        .catch(e => {
-          this.loading = false
-        })
+    prompt(payload, status) {
+      this.$store.dispatch('dialog/setDialogParams', {
+        visibility: true,
+        title: status === 2 ? 'Активировать?' : 'Отклонить',
+        okLabel: 'Да',
+        cancelLabel: 'Нет',
+        confirm: true,
+        okAction: () => {
+          this.activateApi(payload, status)
+          this.$store.dispatch('dialog/setDialogParams', {})
+        }
+      })
     },
-    async deactivate(payload, status) {
+    async activateApi(payload, status) {
       this.loading = true
       await this.$axios
         .post('/admin/resource/status', {
@@ -353,9 +351,7 @@ export default {
           })
           newItem.status = res.status
           newItem.statustitle = res.statustitle
-        } catch (error) {
-          console.log('error then update table')
-        }
+        } catch (error) {}
       })
       this.selected = []
       this.$refs.table.$data.selection = {}

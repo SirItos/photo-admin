@@ -74,6 +74,9 @@ export default {
       }, 300)
     })
   },
+  beforeDestroy() {
+    this.loading = false
+  },
   methods: {
     async auth() {
       if (!this.$refs.form.validate()) {
@@ -86,8 +89,13 @@ export default {
         login: this.login,
         password: this.password
       })
-      this.$set(this.height, 'height', '328px')
-      this.loading = false
+      setTimeout(
+        () => {
+          this.$set(this.height, 'height', '328px')
+          this.loading = false
+        },
+        this.$store.state.user.error ? 0 : 10000
+      )
     }
   }
 }
