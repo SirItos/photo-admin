@@ -200,9 +200,7 @@ export default {
       }
     }
   },
-  created() {
-    this.$store.dispatch('global/changeHeader', 'Анкеты пользователей')
-  },
+
   mounted() {
     this.$nextTick(() => {
       this.page_mounted = true
@@ -308,7 +306,10 @@ export default {
       this[action](payload, status)
     },
     check(payload) {
-      this.$router.push(`/profiles/check/${payload[0].id}`)
+      this.$router.push({
+        path: `/profiles/check`,
+        query: { id: payload[0].id }
+      })
     },
     prompt(payload, status) {
       this.$store.dispatch('dialog/setDialogParams', {

@@ -10,6 +10,7 @@ export const actions = {
 
 export const mutations = {
   CHANGE_HEADER(state, payload) {
+    if (!payload) return
     state.header = payload
   }
 }
