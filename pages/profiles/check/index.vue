@@ -11,12 +11,13 @@
           {{item.title }} :
           <b-table-status :status="item.statustitle.status_title" detail />
         </v-col>
+        <v-spacer class="d-none d-sm-block"></v-spacer>
         <div>
-          <v-row no-gutters class="justify-end pt-xs-2">
-            <v-col v-if="item.status !== 2" xs="12" md="6" class="pa-1">
+          <v-row class="justify-end pt-xs-2">
+            <v-col v-if="item.status !== 2" xs="12">
               <v-btn @click="prompt(2)" depressed color="primary" block>Актвировать</v-btn>
             </v-col>
-            <v-col v-if="item.status !== 3" xs="12" md="6" class="pa-1">
+            <v-col v-if="item.status !== 3" xs="12">
               <v-btn @click="prompt(3)" depressed color="primary" text block>Отклонить</v-btn>
             </v-col>
           </v-row>
