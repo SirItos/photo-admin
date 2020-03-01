@@ -16,21 +16,8 @@ export default {
     status: {
       type: String,
       default: 0
-    }
-  },
-  computed: {
-    statusToHumanView() {
-      switch (this.status) {
-        case 0:
-          return 'Новый'
-        case 1:
-          return 'Просмотрен'
-        case 2:
-          return 'Принят'
-        case 3:
-          return 'Отклонен'
-      }
-    }
+    },
+    detail: Boolean
   }
 }
 </script>

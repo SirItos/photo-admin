@@ -5,6 +5,13 @@
         Общая информация
         <v-divider class="primary my-2"></v-divider>
       </v-col>
+      <v-col sm="6" cols="12" v-if="item.user.user_details">
+        <v-text-field
+          readonly
+          label="Телефон для клиентов"
+          :value="item.user.user_details.display_phone || 'Не указан'"
+        />
+      </v-col>
       <v-col sm="6" cols="12">
         <v-text-field readonly label="Адресс" :value="item.address" />
       </v-col>
@@ -23,8 +30,9 @@
         />
       </v-col>
       <v-col sm="6" cols="12">
-        <v-text-field readonly label="Стоиомсть" :value="item.address" />
+        <b-price :price="[item.min_cost,item.max_cost]" />
       </v-col>
+
       <v-col sm="6" cols="12">
         <v-text-field
           readonly
@@ -42,6 +50,9 @@
 <script>
 export default {
   name: 'BaseInfo',
+  components: {
+    'b-price': () => import('@/components/AppProfileCheckBasicInfo_Price')
+  },
   props: {
     item: {
       type: Object,

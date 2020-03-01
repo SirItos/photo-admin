@@ -2,10 +2,14 @@
   <v-app>
     <v-app-bar app color="white" class="elevation-0">
       <v-toolbar-title>{{$store.state.global.header}}</v-toolbar-title>
-      <!-- <v-toolbar-title>
-        <v-breadcrumbs :items="bread"></v-breadcrumbs>
-      </v-toolbar-title>-->
+      <!-- 
+      <template v-slot:extension>
+        <v-breadcrumbs class="px-0 py-2" :items="$store.state.global.breadcrumbs"></v-breadcrumbs>
+      </template>-->
     </v-app-bar>
+    <v-overlay :value="$store.state.global.overlay" opacity="0.8">
+      <v-progress-circular indeterminate color="primary" width="7" size="64"></v-progress-circular>
+    </v-overlay>
     <v-navigation-drawer
       v-model="drawler"
       class="white--text"

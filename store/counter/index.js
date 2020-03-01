@@ -26,6 +26,6 @@ export const mutations = {
     })
   },
   SUB_COUNTER(state, payload) {
-    state[payload.key] = payload.value
+    if (state[payload.key]) state[payload.key] -= 1
   }
 }
