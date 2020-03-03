@@ -43,8 +43,13 @@
                 <v-btn type="submit" :disabled="loading" large width="250" color="primary">Войти</v-btn>
               </v-card-actions>
             </div>
-            <div v-else key="loading" class="px-6 py-12 d-flex justify-center align-center">
+            <div
+              v-else
+              key="loading"
+              class="px-6 py-12 d-flex flex-wrap justify-center align-center"
+            >
               <v-progress-circular :size="86" color="primary" width="7" indeterminate></v-progress-circular>
+              <div style="width:100%" class="py-3 text-center">{{loadingMessage}}</div>
             </div>
           </v-fade-transition>
         </v-form>
@@ -59,6 +64,7 @@ export default {
   layout: 'authLayout',
   data: () => ({
     login: null,
+    loadingMessage: 'Загрузка...',
     password: null,
     show: false,
     loading: false,
@@ -83,12 +89,14 @@ export default {
         return
       }
       this.loading = true
-      this.$set(this.height, 'height', '246px')
+      this.loadingMessage = 'Аунтификация'
+      this.$set(this.height, 'height', '292px')
 
       await this.$store.dispatch('user/auth', {
         login: this.login,
         password: this.password
       })
+      this.loadingMessage = 'Получение данных профиля'
       setTimeout(
         () => {
           this.$set(this.height, 'height', '328px')

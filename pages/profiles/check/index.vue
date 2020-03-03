@@ -3,11 +3,11 @@
     <v-col cols="12 white" style="position:sticky; top:56px; z-index:1">
       <v-row no-gutters class="align-center __nuxt-error-page">
         <div style="max-width:36px" class="mr-2 d-none d-sm-block">
-          <v-btn nuxt to="/profiles" color="primary" icon>
+          <v-btn @click="$router.replace('/profiles')" color="primary" text icon>
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </div>
-        <v-col sm="7" xs="12" class="title">
+        <v-col xs="12" class="title">
           {{item.title }} :
           <b-table-status :status="item.statustitle.status_title" detail />
         </v-col>

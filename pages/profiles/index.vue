@@ -29,6 +29,7 @@
         item-key="id"
         show-select
       >
+        <template v-slot:item.title="{ item }">{{item.title || 'Не указано'}}</template>
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
@@ -40,7 +41,7 @@
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-btn small text icon v-on="on" class="mr-2" @click="check([item])">
-                  <v-icon small>mdi-pencil</v-icon>
+                  <v-icon small>mdi-eye</v-icon>
                 </v-btn>
               </template>
               <span>Проверить</span>
@@ -61,7 +62,7 @@
                 <v-list-item
                   v-for="(listItem, index) in menuListPrepare(item.status)"
                   :key="index"
-                  @click="menuAction(listItem.actions,[item], listItem.status)"
+                  @click="menuAction(listItem.actions,[item],listItem.label, listItem.status)"
                 >
                   <v-list-item-title>{{ listItem.label }}</v-list-item-title>
                 </v-list-item>
@@ -71,12 +72,13 @@
         </template>
       </v-data-table>
       <v-expand-transition>
-        <v-col xs="12" sm="4" class="d-felx dropdown py-0" v-if="selected.length" key="actions_btn">
+        <v-col xs="12" sm="5" class="d-felx dropdown py-0" v-if="selected.length" key="actions_btn">
           <v-overflow-btn
             :items="dropdown_icon"
             background-color="primary"
             color="white"
-            class="text--white text-none"
+            class="text--white"
+            style="text-transform:none!important"
             value="activate"
             segmented
             target="#dropdown-example"
@@ -88,6 +90,7 @@
 </template>
 
 <script>
+import { tableMixins } from '@/mixins'
 export default {
   name: 'ProfilesPage',
   async asyncData({ query, store, $axios }) {
@@ -130,21 +133,9 @@ export default {
         })
       })
   },
-  middleware: ['counterMiddleware'],
-  components: {
-    'b-table-status': () => import('@/components/AppTableStatus')
-  },
+  mixins: [tableMixins],
   data: vm => ({
-    search: null,
-    wait: false,
-    page_mounted: false,
-    singleSelect: false,
-    selected: [],
-    total: 0,
-    loading: false,
-    options: {
-      itemsPerPage: 15
-    },
+    api: 'resources',
     headers: [
       {
         text: 'id',
@@ -183,79 +174,16 @@ export default {
       {
         text: 'Активировать',
         value: 'activate',
-        callback: () => vm.prompt(vm.selected, 2)
+        callback: () => vm.prompt(vm.selected, 'Активировать', 2)
       },
       {
         text: 'Отклонить',
         value: 'deactivate',
-        callback: () => vm.prompt(vm.selected, 3)
+        callback: () => vm.prompt(vm.selected, 'Отклонить', 3)
       }
     ]
   }),
-  watch: {
-    options: {
-      handler() {
-        if (!this.page_mounted) return
-        this.loadApiData()
-      }
-    }
-  },
-
-  mounted() {
-    this.$nextTick(() => {
-      this.page_mounted = true
-    })
-  },
   methods: {
-    fillSelected(arr) {
-      this.selected = arr
-    },
-    searching() {
-      if (!this.wait) {
-        this.wait = true
-        setTimeout(() => {
-          this.loadApiData()
-          this.wait = false
-        }, 1000)
-      }
-    },
-    async loadApiData() {
-      this.cahngeRouteParams()
-      this.loading = true
-      await this.$axios
-        .post('/admin/resources', {
-          page: this.options.page,
-          paginate: this.options.paginate,
-          sortBy: this.options.sortBy[0],
-          sortDesc: this.options.sortDesc[0] ? 'desc' : 'asc',
-          search: this.search
-        })
-        .then(response => {
-          this.loading = false
-          this.items = response.data.data
-          this.total = response.data.total
-        })
-        .catch(e => {
-          this.$store.dispatch('dialog/setDialogParams', {
-            visibility: true,
-            title: 'Ошибка',
-            text:
-              'Произошла ошибка при получение данных, повтороите попытку позднее',
-            okLabel: 'Ок'
-          })
-        })
-    },
-    cahngeRouteParams() {
-      let query = Object.assign({}, this.$route.query, {
-        page: this.options.page,
-        paginate: this.options.itemsPerPage,
-        order: this.options.sortBy[0],
-        desc: this.options.sortDesc[0],
-        search: this.search
-      })
-      this.$router.push({ query: query })
-    },
-
     menuListPrepare(status) {
       return status === 3
         ? [
@@ -301,61 +229,11 @@ export default {
             }
           ]
     },
-    menuAction(action, payload, status) {
-      if (!action) return
-      this[action](payload, status)
-    },
     check(payload) {
       this.$router.push({
         path: `/profiles/check`,
         query: { id: payload[0].id }
       })
-    },
-    prompt(payload, status) {
-      this.$store.dispatch('dialog/setDialogParams', {
-        visibility: true,
-        title: status === 2 ? 'Активировать?' : 'Отклонить',
-        okLabel: 'Да',
-        cancelLabel: 'Нет',
-        confirm: true,
-        okAction: () => {
-          this.activateApi(payload, status)
-          this.$store.dispatch('dialog/setDialogParams', {})
-        }
-      })
-    },
-    async activateApi(payload, status) {
-      this.loading = true
-      await this.$axios
-        .post('/admin/resource/status', {
-          resources: this.payloadStatusCreate(payload),
-          status: status
-        })
-        .then(response => {
-          this.changeItemsStauts(response.data.resources)
-          this.loading = false
-        })
-        .catch(e => {
-          this.loading = false
-        })
-    },
-    payloadStatusCreate(resources) {
-      return resources.map(item => {
-        return item.id
-      })
-    },
-    changeItemsStauts(arr) {
-      arr.forEach(res => {
-        try {
-          let newItem = this.items.find(item => {
-            return item.id === res.id
-          })
-          newItem.status = res.status
-          newItem.statustitle = res.statustitle
-        } catch (error) {}
-      })
-      this.selected = []
-      this.$refs.table.$data.selection = {}
     }
   }
 }

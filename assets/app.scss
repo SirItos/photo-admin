@@ -58,3 +58,7 @@
     border: none !important;
   }
 }
+.dropdown .v-btn__content,
+.dropdown i.v-icon {
+  text-transform: none !important;
+}
