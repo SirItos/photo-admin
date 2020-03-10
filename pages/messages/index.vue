@@ -48,10 +48,10 @@
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-btn small text icon v-on="on" class="mr-2" @click="check([item])">
-                  <v-icon small>mdi-eye</v-icon>
+                  <v-icon small>mdi-email-send-outline</v-icon>
                 </v-btn>
               </template>
-              <span>Проверить</span>
+              <span>Ответить</span>
             </v-tooltip>
 
             <v-menu offset-y>

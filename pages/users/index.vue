@@ -3,12 +3,25 @@
   <v-row class="column pa-4 fill-height" no-gutters>
     <v-col class="pt-12">
       <div class="d-flex justify-center">
-        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>Работает только отображение. Фильрация в процессе
+        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>Остался функционал добавления новых пользователей( частично готово)
         <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>
       </div>
       <div>
-        <v-row class="justify-end">
-          <v-col lg="4" md="5" sm="6" xs="12">
+        <v-row no-gutters class="align-center flex-wrap">
+          <v-col cols="12" sm="auto">
+            <v-btn
+              @click="$router.push({
+        path: `/users/details`})"
+              block
+              depressed
+              color="primary"
+            >
+              Добавить
+              <v-icon rigth>mdi-plus</v-icon>
+            </v-btn>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col lg="4" md="5" sm="6" cols="12">
             <v-text-field
               v-model="search"
               @input="searching"
@@ -35,13 +48,14 @@
         show-select
       >
         <template v-slot:item.login="{ item }">{{item.login || `+7 ${item.phone}` || '----'}}</template>
+        <template v-slot:item.roles[0].name="{ item }">{{item.roles[0].name_ru}}</template>
         <template v-slot:item.user_details.activated="{ item }">
           {{
           item.user_details ? item.user_details.activated ? 'Да' : "Нет" : '----'}}
         </template>
         <template
           v-slot:item.user_details.email="{ item }"
-        >{{item.user_details ? item.user_details.email : '----'}}</template>
+        >{{item.user_details ? item.user_details.email || '----' : '----'}}</template>
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
@@ -56,10 +70,10 @@
                   <v-icon small>mdi-pencil</v-icon>
                 </v-btn>
               </template>
-              <span>Проверить</span>
+              <span>Редактировать</span>
             </v-tooltip>
 
-            <v-menu offset-y>
+            <v-menu offset-y v-if="compareRoles(item)">
               <template v-slot:activator="{ on: menu }">
                 <v-tooltip top>
                   <template v-slot:activator="{ on: tooltip }">
@@ -156,14 +170,14 @@ export default {
         text: 'id',
         align: 'center',
         value: 'id',
-        sortable: true
+        sortable: false
       },
 
       {
         text: 'Логин / Номер телефона',
         value: 'login',
         align: 'center',
-        sortable: true
+        sortable: false
       },
       // {
       //   text: 'Активная учетная запиьс',
@@ -182,20 +196,26 @@ export default {
         text: 'Email',
         value: 'user_details.email',
         align: 'center',
-        sortable: true
+        sortable: false
       },
 
       {
         text: 'Роль',
         value: 'roles[0].name',
         align: 'center',
-        sortable: true
+        sortable: false
+      },
+      {
+        text: 'Активный',
+        value: 'statustitle.status_title',
+        align: 'center',
+        sortable: false
       },
       {
         text: 'Дата регистрации',
         value: 'created_at',
         align: 'center',
-        sortable: true
+        sortable: false
       },
       {
         text: 'Действия',
@@ -209,42 +229,52 @@ export default {
       {
         text: 'Активировать',
         value: 'activate',
-        callback: () => vm.prompt(vm.selected, 'Активировать', 4)
+        callback: () => vm.prompt(vm.selected, 'Активировать', 5)
       },
       {
-        text: 'Деактивировать',
+        text: 'Заблокировать',
         value: 'deactivate',
-        callback: () => vm.prompt(vm.selected, 'Деактивировать', 1)
+        callback: () => vm.prompt(vm.selected, 'Заблокировать', 6)
       }
     ]
   }),
   methods: {
     menuListPrepare(status) {
-      return status === 2
+      return status === 5
         ? [
             {
               label: 'Редактировать',
               actions: 'check',
-              status: 1
+              status: 5
             },
             {
-              label: 'Деактивировать',
+              label: 'Заблокировать',
               actions: 'prompt',
-              status: 3
+              status: 6
             }
           ]
         : [
             {
               label: 'Редактировать',
               actions: 'check',
-              status: 1
+              status: 6
             },
             {
               label: 'Активировать',
               actions: 'prompt',
-              status: 2
+              status: 5
             }
           ]
+    },
+    compareRoles(item) {
+      if (this.$store.state.user.role === 'admin') return true
+      return item.roles[0].name !== 'admin'
+    },
+    check(payload) {
+      this.$router.push({
+        path: `/users/details`,
+        query: { id: payload[0].id }
+      })
     }
   }
 }
