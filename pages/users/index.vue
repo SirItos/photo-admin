@@ -2,13 +2,9 @@
   <!-- <b-in-progress /> -->
   <v-row class="column pa-4 fill-height" no-gutters>
     <v-col class="pt-12">
-      <div class="d-flex justify-center">
-        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>Остался функционал добавления новых пользователей( частично готово)
-        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>
-      </div>
       <div>
         <v-row no-gutters class="align-center flex-wrap">
-          <v-col cols="12" sm="auto">
+          <v-col cols="12" sm="auto" v-if="$store.state.user.role==='admin'">
             <v-btn
               @click="$router.push({
         path: `/users/details`})"
@@ -81,7 +77,7 @@
                       <v-icon small>mdi-dots-vertical</v-icon>
                     </v-btn>
                   </template>
-                  <span>меню</span>
+                  <span>еще</span>
                 </v-tooltip>
               </template>
               <v-list>

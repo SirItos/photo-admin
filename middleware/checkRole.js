@@ -14,7 +14,7 @@ export default function({ app, route, store, redirect }) {
       if (route.fullPath === '/') {
         redirect('/profiles')
       }
-      await store.dispatch('counter/loadCounter')
+      // await store.dispatch('counter/loadCounter')
       store.dispatch('global/changeHeader', setHeader(route.fullPath))
       resolve()
     }

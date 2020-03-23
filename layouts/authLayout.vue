@@ -7,6 +7,7 @@
     </v-content>
     <v-dialog
       :value="visibility"
+      max-width="400"
       @click:outside="$store.dispatch('dialog/setDialogParams',{})"
       style="z-index:1200"
     >

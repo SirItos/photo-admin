@@ -100,7 +100,10 @@ export const tableMixins = {
         })
         .then(response => {
           this.$store.dispatch('counter/loadCounter')
-          this.changeItemsStauts(response.data.obj)
+          response.data.delete
+            ? this.deleteRows(response.data.obj)
+            : this.changeItemsStauts(response.data.obj)
+
           this.loading = false
         })
         .catch(e => {
@@ -119,6 +122,17 @@ export const tableMixins = {
       })
       this.selected = []
       this.$refs.table.$data.selection = {}
+    },
+    deleteRows(arr) {
+      arr.forEach(res => {
+        try {
+          let itemToDelete = this.items.findIndex(item => {
+            return Number(item.id) === Number(res)
+          })
+
+          this.items.splice(itemToDelete, 1)
+        } catch (error) {}
+      })
     },
     payloadStatusCreate(resources) {
       return resources.map(item => {

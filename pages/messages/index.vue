@@ -2,10 +2,6 @@
   <!-- <b-in-progress /> -->
   <v-row class="column pa-4 fill-height" no-gutters>
     <v-col class="pt-12">
-      <div class="d-flex justify-center">
-        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>Нет детального экрана
-        <v-icon size="18" color="primary" class="d-flex justify-center">mdi-alert-outline</v-icon>
-      </div>
       <div>
         <v-row class="justify-end">
           <v-col lg="4" md="5" sm="6" xs="12">
@@ -48,10 +44,10 @@
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-btn small text icon v-on="on" class="mr-2" @click="check([item])">
-                  <v-icon small>mdi-email-send-outline</v-icon>
+                  <v-icon small>mdi-eye</v-icon>
                 </v-btn>
               </template>
-              <span>Ответить</span>
+              <span>Просмотреть</span>
             </v-tooltip>
 
             <v-menu offset-y>
@@ -62,12 +58,12 @@
                       <v-icon small>mdi-dots-vertical</v-icon>
                     </v-btn>
                   </template>
-                  <span>меню</span>
+                  <span>еще</span>
                 </v-tooltip>
               </template>
               <v-list>
                 <v-list-item
-                  v-for="(listItem, index) in menuListPrepare(item.status)"
+                  v-for="(listItem, index) in menuListPrepare(item.status, !!item.answer)"
                   :key="index"
                   @click="menuAction(listItem.actions,[item],listItem.label, listItem.status)"
                 >
@@ -198,12 +194,35 @@ export default {
         text: 'Отметить как не прочитанное',
         value: 'deactivate',
         callback: () => vm.prompt(vm.selected, 'Отметить как не прочитанное', 1)
+      },
+      {
+        text: 'Удалить',
+        value: 'delete',
+        callback: () => vm.prompt(vm.selected, 'Удалить', -1)
       }
     ]
   }),
   methods: {
-    menuListPrepare(status) {
-      return status === 4
+    menuListPrepare(status, answer) {
+      return status !== 4
+        ? [
+            {
+              label: 'Просмортреть',
+              actions: 'check',
+              status: 1
+            },
+            {
+              label: 'Отметить как отработанное',
+              actions: 'prompt',
+              status: 4
+            },
+            {
+              label: 'Удалить',
+              actions: 'prompt',
+              status: -1
+            }
+          ]
+        : !answer
         ? [
             {
               label: 'Просмортреть',
@@ -214,6 +233,11 @@ export default {
               label: 'Отменить как не прочитанное',
               actions: 'prompt',
               status: 1
+            },
+            {
+              label: 'Удалить',
+              actions: 'prompt',
+              status: -1
             }
           ]
         : [
@@ -223,11 +247,22 @@ export default {
               status: 1
             },
             {
-              label: 'Отметить как отработанное',
+              label: 'Удалить',
               actions: 'prompt',
-              status: 4
+              status: -1
             }
           ]
+    },
+    check(payload) {
+      if (!payload[0].status) {
+        this.$store.dispatch('counter/subCounter', {
+          key: 'feedback'
+        })
+      }
+      this.$router.push({
+        path: `/messages/details`,
+        query: { id: payload[0].id }
+      })
     }
   }
 }

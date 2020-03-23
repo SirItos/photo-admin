@@ -7,10 +7,10 @@
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </div>
-        <v-col xs="12" class="title">
-          {{item.title }} :
+        <div xs="12" class="title">
+          {{item.title || 'Нет имени' }} :
           <b-table-status :status="item.statustitle.status_title" detail />
-        </v-col>
+        </div>
         <v-spacer class="d-none d-sm-block"></v-spacer>
         <div>
           <v-row class="justify-end pt-xs-2">
@@ -46,10 +46,6 @@ export default {
     return await $axios
       .post('/get-resource-params', { id: query.id, all: true, admin: true })
       .then(response => {
-        store.dispatch('counter/subCounter', {
-          key: 'resources'
-        })
-
         return {
           item: response.data
         }
@@ -83,18 +79,14 @@ export default {
     async activateApi(status) {
       this.$store.dispatch('global/setOverlay', true)
       await this.$axios
-        .post('/admin/resource/status', {
-          resources: [this.item.id],
+        .post('/admin/resources/status', {
+          obj: [this.item.id],
           status: status
         })
         .then(response => {
           this.$store.dispatch('global/setOverlay', false)
-          this.$set(this.item, 'status', response.data.resources[0].status)
-          this.$set(
-            this.item,
-            'statustitle',
-            response.data.resources[0].statustitle
-          )
+          this.$set(this.item, 'status', response.data.obj[0].status)
+          this.$set(this.item, 'statustitle', response.data.obj[0].statustitle)
         })
         .catch(e => {
           this.$store.dispatch('global/setOverlay', false)

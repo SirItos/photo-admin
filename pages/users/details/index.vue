@@ -56,6 +56,7 @@
               v-model="role"
               :items="availbRoleList"
               :loading="itemLoading"
+              :readonly="$store.state.user.id === id"
               label="Роль"
               return-object
               item-text="text"
@@ -121,7 +122,8 @@ export default {
           id: response.data.id,
           role: {
             id: response.data.roles[0].id,
-            text: response.data.roles[0].name_ru
+            text: response.data.roles[0].name_ru,
+            value: response.data.roles[0].name
           },
           details: {
             user_id: response.data.userDetails
@@ -196,7 +198,7 @@ export default {
       if (this.$refs.form.validate()) {
         this.$store.dispatch('global/setOverlay', true)
         await this.$axios
-          .post(`/admin/user/${this.$route.query.id ? 'edit' : 'save'}`, {
+          .post(`/admin/user/${this.$route.query.id ? 'edit' : 'create'}`, {
             id: this.id,
             role: this.role,
             details: this.details,
@@ -209,13 +211,17 @@ export default {
           })
           .then(response => {
             this.$store.dispatch('global/setOverlay', false)
+            if (this.id === this.$store.state.user.id) {
+              this.$store.dispatch('user/updageName', response.data)
+            }
+            this.$router.back()
           })
           .catch(e => {
             this.$store.dispatch('global/setOverlay', false)
-            this.store.dispatch('dialog/setDialogParams', {
+            this.$store.dispatch('dialog/setDialogParams', {
               visibility: true,
               title: 'Ошибка',
-              text: 'Произошла ошибка при получение данных',
+              text: 'Произошла ошибка',
               okLabel: 'Ок'
             })
           })
@@ -228,7 +234,8 @@ export default {
           this.items = response.data.map(row => {
             return {
               id: row.id,
-              text: row.name_ru
+              text: row.name_ru,
+              value: row.name
             }
           })
           this.itemLoading = false

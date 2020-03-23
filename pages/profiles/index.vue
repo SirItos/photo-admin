@@ -55,7 +55,7 @@
                       <v-icon small>mdi-dots-vertical</v-icon>
                     </v-btn>
                   </template>
-                  <span>меню</span>
+                  <span>еще</span>
                 </v-tooltip>
               </template>
               <v-list>
@@ -230,6 +230,11 @@ export default {
           ]
     },
     check(payload) {
+      if (!payload[0].status) {
+        this.$store.dispatch('counter/subCounter', {
+          key: 'resources'
+        })
+      }
       this.$router.push({
         path: `/profiles/check`,
         query: { id: payload[0].id }

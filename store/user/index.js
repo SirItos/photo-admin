@@ -6,7 +6,7 @@ export const state = () => ({
 })
 
 export const actions = {
-  async auth({ commit }, payload) {
+  async auth({ commit, dispatch }, payload) {
     await this.$axios
       .post('/auth', Object.assign(payload, { type: 'login' }))
       .then(response => {
@@ -18,7 +18,16 @@ export const actions = {
         $nuxt.$router.push('/profiles')
       })
       .catch(e => {
-        console.log(e)
+        dispatch(
+          'dialog/setDialogParams',
+          {
+            visibility: true,
+            title: 'Ошибка аунтификации',
+            text: e.response ? e.response.data : 'Ошибка соединения',
+            okLabel: 'Ок'
+          },
+          { root: true }
+        )
         commit('SET_ERROR', true)
       })
   },
@@ -36,14 +45,21 @@ export const actions = {
         commit('SET_USER_PARAMS', response.data)
       })
       .catch(e => {})
+  },
+
+  updageName({ commit }, payload) {
+    commit('UPD_NAME', payload)
   }
 }
 
 export const mutations = {
   SET_USER_PARAMS(state, payload) {
     state.id = payload.id
-    state.name = payload.user_details ? payload.user_details.name : null
+    state.name = payload.userDetails ? payload.userDetails.name : null
     state.role = payload.roles[0].name
+  },
+  UPD_NAME(state, payload) {
+    state.name = payload
   },
   LOG_OUT(state) {
     ;(state.id = null), (state.name = null), (state.role = null)
