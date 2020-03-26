@@ -61,7 +61,11 @@ export const tableMixins = {
           paginate: this.options.paginate,
           sortBy: this.options.sortBy[0],
           sortDesc: this.options.sortDesc[0] ? 'desc' : 'asc',
-          search: this.search
+          search: this.search,
+          filter: {
+            role: this.filteredRole.length ? this.filteredRole : undefined,
+            status: this.statusFilter.length ? this.statusFilter : undefined
+          }
         })
         .then(response => {
           this.loading = false
@@ -78,16 +82,20 @@ export const tableMixins = {
           })
         })
     },
-    prompt(payload, title, status) {
+    prompt(payload, title, status, options = {}) {
+      const { form } = options
+
       this.$store.dispatch('dialog/setDialogParams', {
         visibility: true,
         title: `${title}?`,
         okLabel: 'Да',
         cancelLabel: 'Нет',
         confirm: true,
-        okAction: () => {
-          this.changeStatusApi(payload, status)
+        form: form,
+        okAction: async () => {
           this.$store.dispatch('dialog/setDialogParams', {})
+          await this.changeStatusApi(payload, status)
+          this.$store.dispatch('dialog/setReason', { reason: null })
         }
       })
     },
@@ -96,7 +104,8 @@ export const tableMixins = {
       await this.$axios
         .post(`/admin/${this.api}/status`, {
           obj: this.payloadStatusCreate(payload),
-          status: status
+          status: status,
+          reason: this.$store.state.dialog.reason
         })
         .then(response => {
           this.$store.dispatch('counter/loadCounter')
@@ -139,9 +148,10 @@ export const tableMixins = {
         return item.id
       })
     },
-    menuAction(action, payload, title, status) {
+    menuAction(action, payload, title, status, options = {}) {
       if (!action) return
-      this[action](payload, title, status)
+
+      this[action](payload, title, status, options)
     }
   }
 }

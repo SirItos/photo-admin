@@ -14,11 +14,20 @@
         <v-spacer class="d-none d-sm-block"></v-spacer>
         <div>
           <v-row class="justify-end pt-xs-2">
-            <v-col v-if="item.status !== 2" xs="12">
-              <v-btn @click="prompt(2)" depressed color="primary" block>Актвировать</v-btn>
+            <v-col v-if="item.status !== 2 " xs="12">
+              <v-btn @click="prompt(2,'Активировать')" depressed color="primary" block>Актвировать</v-btn>
             </v-col>
-            <v-col v-if="item.status !== 3" xs="12">
-              <v-btn @click="prompt(3)" depressed color="primary" text block>Отклонить</v-btn>
+            <v-col v-if="item.status !== 3 && item.status !== 2 && item.status !== 6" xs="12">
+              <v-btn @click="prompt(3,'Отклонить')" depressed color="primary" text block>Отклонить</v-btn>
+            </v-col>
+            <v-col v-if="item.status === 2" xs="12">
+              <v-btn
+                @click="prompt(6,'Заблокировать')"
+                depressed
+                color="primary"
+                text
+                block
+              >Заблокировать</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -63,10 +72,10 @@ export default {
     item: null
   }),
   methods: {
-    prompt(status) {
+    prompt(status, title) {
       this.$store.dispatch('dialog/setDialogParams', {
         visibility: true,
-        title: status === 2 ? 'Активировать?' : 'Отклонить',
+        title: `${title}?`,
         okLabel: 'Да',
         cancelLabel: 'Нет',
         confirm: true,

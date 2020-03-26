@@ -6,12 +6,17 @@ export const state = () => ({
   cancelLabel: null,
   okAction: null,
   cancelAction: null,
-  confirm: false
+  confirm: false,
+  form: false,
+  reason: null
 })
 
 export const actions = {
   setDialogParams({ commit }, payload) {
     commit('SET_DIALOG_PARAMS', payload)
+  },
+  setReason({ commit }, { reason }) {
+    commit('SET_REASON', reason)
   }
 }
 
@@ -25,5 +30,9 @@ export const mutations = {
     state.cancelAction = payload.cancelAction || null
     state.confirm = payload.confirm || false
     state.okAction = payload.okAction || null
+    state.form = payload.form || false
+  },
+  SET_REASON(state, payload) {
+    state.reason = payload || null
   }
 }

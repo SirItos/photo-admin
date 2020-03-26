@@ -26,6 +26,55 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col class="pl-6 d-flex align-center"></v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="filteredRole"
+              @change="loadApiData"
+              :items="rolesList"
+              prepend-icon="mdi-filter"
+              dence
+              multiple
+              label="Роль"
+              item-text="text"
+              item-value="id"
+              style="text-transform:capitalize"
+            >
+              <template v-slot:selection="{item,index}">
+                <v-chip
+                  :input-value="selected"
+                  close
+                  class="primary"
+                  @click:close="remove(index,'filteredRole')"
+                >{{ item.text }}</v-chip>
+              </template>
+            </v-select>
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="statusFilter"
+              @change="loadApiData"
+              :items="statusList"
+              multiple
+              dence
+              prepend-icon="mdi-filter"
+              label="Статус"
+              item-text="text"
+              item-value="id"
+              style="text-transform:capitalize"
+            >
+              <template v-slot:selection="{item,index}">
+                <v-chip
+                  :input-value="selected"
+                  close
+                  class="primary"
+                  @click:close="remove(index,'statusFilter')"
+                >{{ item.text }}</v-chip>
+              </template>
+            </v-select>
+          </v-col>
+        </v-row>
       </div>
       <v-data-table
         ref="table"
@@ -43,7 +92,7 @@
         item-key="id"
         show-select
       >
-        <template v-slot:item.login="{ item }">{{item.login || `+7 ${item.phone}` || '----'}}</template>
+        <template v-slot:item.login="{ item }">{{item.login || formatPhone(item.phone) || '----'}}</template>
         <template v-slot:item.roles[0].name="{ item }">{{item.roles[0].name_ru}}</template>
         <template v-slot:item.user_details.activated="{ item }">
           {{
@@ -161,6 +210,19 @@ export default {
   mixins: [tableMixins],
   data: vm => ({
     api: 'user',
+    rolesList: [],
+    statusList: [
+      {
+        text: 'Активен',
+        id: 5
+      },
+      {
+        text: 'заблокирован',
+        id: 6
+      }
+    ],
+    statusFilter: [],
+    filteredRole: [],
     headers: [
       {
         text: 'id',
@@ -234,6 +296,9 @@ export default {
       }
     ]
   }),
+  created() {
+    this.loadRoleList()
+  },
   methods: {
     menuListPrepare(status) {
       return status === 5
@@ -271,6 +336,32 @@ export default {
         path: `/users/details`,
         query: { id: payload[0].id }
       })
+    },
+    remove(index, target) {
+      if (index >= 0) {
+        this[target].splice(index, 1)
+        this.loadApiData()
+      }
+    },
+    loadRoleList() {
+      this.$axios.get('role-list').then(response => {
+        this.rolesList = response.data.map(row => {
+          return {
+            id: row.id,
+            text: row.name_ru,
+            value: row.name
+          }
+        })
+      })
+    },
+    formatPhone(phone) {
+      let phone_numeric = new String(phone).replace(/[^\d]+/g, '')
+      const phone_formatted = phone_numeric.replace(
+        /(\d{3})(\d{3})(\d{2})(\d{2})/,
+        '+7 ($1) $2-$3-$4'
+      )
+
+      return phone_formatted
     }
   }
 }

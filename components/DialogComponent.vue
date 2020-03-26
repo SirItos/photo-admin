@@ -1,22 +1,38 @@
 <template>
   <v-card>
-    <v-card-title>
-      <div style="word-break: break-word">{{ title }}</div>
-    </v-card-title>
+    <v-form @submit="call" lazy-validation :value="valid" ref="form">
+      <v-card-title>
+        <div style="word-break: break-word">{{ title }}</div>
+      </v-card-title>
 
-    <v-card-text>
-      <div class="black--text" v-html="text"></div>
-    </v-card-text>
+      <v-card-text>
+        <div class="black--text" v-html="text"></div>
+        <div v-if="form">
+          <v-textarea
+            label="Укажите причину"
+            v-model="res"
+            auto-grow
+            :rules="[val=>!!val || 'Необходимо указать причину']"
+          />
+        </div>
+      </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn v-if="confirm" class="text-none" color="primary" @click="cancel" text>{{ cancelLabel }}</v-btn>
-      <v-btn class="text-none" color="primary" depressed @click="call">
-        {{
-        okLabel
-        }}
-      </v-btn>
-    </v-card-actions>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          v-if="confirm"
+          class="text-none"
+          color="primary"
+          @click="cancel"
+          text
+        >{{ cancelLabel }}</v-btn>
+        <v-btn class="text-none" color="primary" depressed @click="call">
+          {{
+          okLabel
+          }}
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -32,17 +48,31 @@ export default {
       'cancelLabel',
       'okAction',
       'cancelAction',
-      'confirm'
+      'confirm',
+      'form',
+      'reason'
     ])
   },
+  data: () => ({
+    valid: false,
+    res: null
+  }),
+  watch: {
+    res: function(newVal) {
+      this.setReason({ reason: newVal })
+    }
+  },
   methods: {
-    ...mapActions('dialog', ['setDialogParams']),
+    ...mapActions('dialog', ['setDialogParams', 'setReason']),
     call() {
-      if (this.okAction) {
-        this.okAction()
-        return
+      if (this.$refs.form.validate()) {
+        if (this.okAction) {
+          this.okAction()
+          return
+        }
+        this.setReason({ reason: null })
+        this.setDialogParams({})
       }
-      this.setDialogParams({})
     },
     cancel() {
       if (this.cancelAction) {
@@ -50,6 +80,7 @@ export default {
         return
       }
       this.setDialogParams({})
+      this.setReason({ reason: null })
     }
   }
 }

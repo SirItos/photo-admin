@@ -62,7 +62,7 @@
                 <v-list-item
                   v-for="(listItem, index) in menuListPrepare(item.status)"
                   :key="index"
-                  @click="menuAction(listItem.actions,[item],listItem.label, listItem.status)"
+                  @click="menuAction(listItem.actions,[item],listItem.label, listItem.status,listItem.options)"
                 >
                   <v-list-item-title>{{ listItem.label }}</v-list-item-title>
                 </v-list-item>
@@ -177,15 +177,16 @@ export default {
         callback: () => vm.prompt(vm.selected, 'Активировать', 2)
       },
       {
-        text: 'Отклонить',
+        text: 'Заблокировать',
         value: 'deactivate',
-        callback: () => vm.prompt(vm.selected, 'Отклонить', 3)
+        callback: () =>
+          vm.prompt(vm.selected, 'Заблокировать', 6, { form: true })
       }
     ]
   }),
   methods: {
     menuListPrepare(status) {
-      return status === 3
+      return status === 3 || status === 6
         ? [
             {
               label: 'Просмортреть',
@@ -206,9 +207,10 @@ export default {
               status: 1
             },
             {
-              label: 'Отклонить',
+              label: 'Заблокировать',
               actions: 'prompt',
-              status: 3
+              status: 6,
+              options: { form: true }
             }
           ]
         : [
@@ -225,7 +227,8 @@ export default {
             {
               label: 'Отклонить',
               actions: 'prompt',
-              status: 3
+              status: 3,
+              options: { form: true }
             }
           ]
     },
