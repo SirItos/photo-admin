@@ -33,7 +33,7 @@
               v-model="filteredRole"
               @change="loadApiData"
               :items="rolesList"
-              prepend-icon="mdi-filter"
+              prepend-inner-icon="mdi-filter"
               dence
               multiple
               label="Роль"
@@ -58,7 +58,7 @@
               :items="statusList"
               multiple
               dence
-              prepend-icon="mdi-filter"
+              prepend-inner-icon="mdi-filter"
               label="Статус"
               item-text="text"
               item-value="id"
@@ -243,12 +243,12 @@ export default {
       //   align: 'center',
       //   sortable: true
       // },
-      // {
-      //   text: 'Номер телефона',
-      //   value: 'phone',
-      //   align: 'center',
-      //   sortable: true
-      // },
+      {
+        text: 'Имя',
+        value: 'user_details.name',
+        align: 'center',
+        sortable: false
+      },
 
       {
         text: 'Email',
@@ -337,12 +337,7 @@ export default {
         query: { id: payload[0].id }
       })
     },
-    remove(index, target) {
-      if (index >= 0) {
-        this[target].splice(index, 1)
-        this.loadApiData()
-      }
-    },
+
     loadRoleList() {
       this.$axios.get('role-list').then(response => {
         this.rolesList = response.data.map(row => {
@@ -353,15 +348,6 @@ export default {
           }
         })
       })
-    },
-    formatPhone(phone) {
-      let phone_numeric = new String(phone).replace(/[^\d]+/g, '')
-      const phone_formatted = phone_numeric.replace(
-        /(\d{3})(\d{3})(\d{2})(\d{2})/,
-        '+7 ($1) $2-$3-$4'
-      )
-
-      return phone_formatted
     }
   }
 }

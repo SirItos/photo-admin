@@ -18,11 +18,17 @@
               <v-btn @click="prompt(2,'Активировать')" depressed color="primary" block>Актвировать</v-btn>
             </v-col>
             <v-col v-if="item.status !== 3 && item.status !== 2 && item.status !== 6" xs="12">
-              <v-btn @click="prompt(3,'Отклонить')" depressed color="primary" text block>Отклонить</v-btn>
+              <v-btn
+                @click="prompt(3,'Отклонить',{ form: true })"
+                depressed
+                color="primary"
+                text
+                block
+              >Отклонить</v-btn>
             </v-col>
             <v-col v-if="item.status === 2" xs="12">
               <v-btn
-                @click="prompt(6,'Заблокировать')"
+                @click="prompt(6,'Заблокировать',{ form: true })"
                 depressed
                 color="primary"
                 text
@@ -72,16 +78,19 @@ export default {
     item: null
   }),
   methods: {
-    prompt(status, title) {
+    prompt(status, title, options = {}) {
+      const { form } = options
       this.$store.dispatch('dialog/setDialogParams', {
         visibility: true,
         title: `${title}?`,
         okLabel: 'Да',
         cancelLabel: 'Нет',
+        form: form,
         confirm: true,
-        okAction: () => {
-          this.activateApi(status)
+        okAction: async () => {
           this.$store.dispatch('dialog/setDialogParams', {})
+          await this.activateApi(status)
+          this.$store.dispatch('dialog/setReason', { reason: null })
         }
       })
     },
@@ -90,7 +99,8 @@ export default {
       await this.$axios
         .post('/admin/resources/status', {
           obj: [this.item.id],
-          status: status
+          status: status,
+          reason: this.$store.state.dialog.reason
         })
         .then(response => {
           this.$store.dispatch('global/setOverlay', false)

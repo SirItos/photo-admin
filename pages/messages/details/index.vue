@@ -67,14 +67,6 @@
         color="primary"
         depressed
       >Ответить</v-btn>
-      <v-btn
-        v-if="message.status !== 4"
-        @click="sendAnswer"
-        :disabled="!answer"
-        large
-        color="primary"
-        depressed
-      >Ответить</v-btn>
     </div>
   </v-row>
 </template>

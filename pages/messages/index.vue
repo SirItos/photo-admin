@@ -32,7 +32,7 @@
       >
         <template
           v-slot:item.user_id="{ item }"
-        >{{item.user ? `+7 ${item.user.phone}` : 'Не указан номер'}}</template>
+        >{{item.user ? formatPhone(item.user.phone) : 'Не указан номер'}}</template>
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>

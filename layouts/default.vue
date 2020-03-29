@@ -45,6 +45,7 @@
       max-width="400"
       @click:outside="$store.dispatch('dialog/setDialogParams',{})"
       style="z-index:1200"
+      @keydown.esc=" () => {$store.dispatch('dialog/setDialogParams',{}); $store.dispatch('dialog/setReason',{reason:null})}"
     >
       <dialog-content />
     </v-dialog>

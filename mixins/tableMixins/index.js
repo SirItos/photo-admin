@@ -11,6 +11,8 @@ export const tableMixins = {
     selected: [],
     total: 0,
     loading: false,
+    filteredRole: [],
+    statusFilter: [],
     options: {
       itemsPerPage: 15
     }
@@ -152,6 +154,21 @@ export const tableMixins = {
       if (!action) return
 
       this[action](payload, title, status, options)
+    },
+    remove(index, target) {
+      if (index >= 0) {
+        this[target].splice(index, 1)
+        this.loadApiData()
+      }
+    },
+    formatPhone(phone) {
+      let phone_numeric = new String(phone).replace(/[^\d]+/g, '')
+      const phone_formatted = phone_numeric.replace(
+        /(\d{3})(\d{3})(\d{2})(\d{2})/,
+        '+7 ($1) $2-$3-$4'
+      )
+
+      return phone_formatted
     }
   }
 }

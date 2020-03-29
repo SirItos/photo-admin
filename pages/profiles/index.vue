@@ -2,7 +2,7 @@
   <v-row class="column pa-4 fill-height" no-gutters>
     <v-col class="pt-12">
       <div>
-        <v-row class="justify-end">
+        <v-row no-gutters class="justify-end">
           <v-col lg="4" md="5" sm="6" xs="12">
             <v-text-field
               v-model="search"
@@ -10,6 +10,32 @@
               label="Поиск"
               prepend-inner-icon="mdi-magnify"
             ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col class="d-flex align-center"></v-col>
+          <v-col lg="4" md="5" sm="6" xs="12">
+            <v-select
+              v-model="statusFilter"
+              @change="loadApiData"
+              :items="statusList"
+              prepend-inner-icon="mdi-filter"
+              dence
+              multiple
+              label="Статус"
+              item-text="text"
+              item-value="id"
+              style="text-transform:capitalize"
+            >
+              <template v-slot:selection="{item,index}">
+                <v-chip
+                  :input-value="selected"
+                  close
+                  class="primary"
+                  @click:close="remove(index,'statusFilter')"
+                >{{ item.text }}</v-chip>
+              </template>
+            </v-select>
           </v-col>
         </v-row>
       </div>
@@ -29,7 +55,9 @@
         item-key="id"
         show-select
       >
-        <template v-slot:item.title="{ item }">{{item.title || 'Не указано'}}</template>
+        <template
+          v-slot:item.user.user_details.name="{ item }"
+        >{{item.user.user_details.name || 'Не указаноы'}}</template>
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
@@ -146,21 +174,21 @@ export default {
 
       {
         text: 'Название',
-        value: 'title',
+        value: 'user.user_details.name',
         align: 'center',
-        sortable: true
+        sortable: false
       },
       {
         text: 'Дата создания',
         value: 'created_at',
         align: 'center',
-        sortable: true
+        sortable: false
       },
       {
         text: 'Статус',
         value: 'status',
         align: 'center',
-        sortable: true
+        sortable: false
       },
       {
         text: 'Действия',
@@ -181,6 +209,29 @@ export default {
         value: 'deactivate',
         callback: () =>
           vm.prompt(vm.selected, 'Заблокировать', 6, { form: true })
+      }
+    ],
+
+    statusList: [
+      {
+        text: 'Новый',
+        id: 0
+      },
+      {
+        text: 'Просмотрена',
+        id: 1
+      },
+      {
+        text: 'Проверена',
+        id: 2
+      },
+      {
+        text: 'Отклонено',
+        id: 3
+      },
+      {
+        text: 'Заблокировано',
+        id: 6
       }
     ]
   }),

@@ -55,12 +55,26 @@ export default {
   },
   data: () => ({
     valid: false,
-    res: null
+    res: null,
+    storeWatcher: null
   }),
   watch: {
     res: function(newVal) {
       this.setReason({ reason: newVal })
     }
+  },
+  created() {
+    this.storeWatcher = this.$store.watch(
+      state => state.dialog.visibility,
+      newVal => {
+        if (!newVal) {
+          this.res = null
+        }
+      }
+    )
+  },
+  beforeDestroy() {
+    this.storeWatcher()
   },
   methods: {
     ...mapActions('dialog', ['setDialogParams', 'setReason']),
@@ -70,12 +84,12 @@ export default {
           this.okAction()
           return
         }
-        this.setReason({ reason: null })
         this.setDialogParams({})
       }
     },
     cancel() {
       if (this.cancelAction) {
+        this.setReason({ reason: null })
         this.cancelAction()
         return
       }
