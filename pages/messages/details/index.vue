@@ -38,7 +38,7 @@
       <v-row>
         <v-col cols="12" :sm="message.answer ? 8 : 12">
           <v-text-field
-            label="Заголовк"
+            label="Заголовк ответа"
             v-model="title"
             :readonly="message.status===4"
             hide-details
@@ -83,13 +83,21 @@ export default {
     return await $axios
       .post('/admin/feedback/details', { id: query.id })
       .then(response => {
-        return { message: response.data, answer: response.data.answer?.answer }
+        store.dispatch(
+          'global/changeHeader',
+          `Сообщение «${response.data.theme || ''}»`
+        )
+        return {
+          message: response.data,
+          answer: response.data.answer?.answer,
+          title: response.data.theme
+        }
       })
       .catch(e => {
         store.dispatch('dialog/setDialogParams', {
           visibility: true,
           title: 'Ошибка',
-          text: 'Произошла ошибка при получение данных',
+          text: 'Произошла ошибка при получении данных',
           okLabel: 'Ок'
         })
       })
@@ -127,7 +135,7 @@ export default {
           this.$store.dispatch('dialog/setDialogParams', {
             visibility: true,
             title: 'Ошибка',
-            text: 'Произошла ошибка при отправке сообщения',
+            text: 'Произошла ошибка при получении данных',
             okLabel: 'Ок'
           })
         })

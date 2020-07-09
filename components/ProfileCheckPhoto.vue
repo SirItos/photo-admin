@@ -18,9 +18,11 @@
           <v-col v-if="!images.length" cols="12" class="title">Нет фотографий</v-col>
           <v-col v-for="(image,index) in images" :key="`image_${index}`" md="3" sm="4" xs="2">
             <div class="img-shadow" @click="imgIndex = index">
-              <v-img :src="image.url" :lazy-src="image.url" cover height="150px">
+              <v-img :src="image.url['320']" :lazy-src="image.url['320']" cover height="150px">
                 <template v-slot:placeholder>
-                  <v-row class="fill-height ma-0" align="center" justify="center">111</v-row>
+                  <v-row class="fill-height ma-0" align="center" justify="center">
+                    <v-progress-circular indeterminate color="primary" width="7" size="64"></v-progress-circular>
+                  </v-row>
                 </template>
               </v-img>
             </div>
@@ -57,7 +59,7 @@ export default {
   computed: {
     galleryArray() {
       return this.images.map(item => {
-        return item.url
+        return item.url.origin
       })
     }
   }

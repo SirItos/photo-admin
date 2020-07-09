@@ -30,7 +30,7 @@
         />
       </v-col>
       <v-col sm="6" cols="12">
-        <b-price :price="[item.min_cost,item.max_cost]" />
+        <b-price :price="item.price_range" />
       </v-col>
 
       <v-col sm="6" cols="12">

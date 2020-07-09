@@ -39,6 +39,7 @@
         <template v-slot:item.status="{ item }">
           <b-table-status :status="item.statustitle.status_title" />
         </template>
+        <template v-slot:item.theme="{ item }">{{item.theme || 'Без темы'}}</template>
         <template v-slot:item.action="{ item }">
           <div class="d-flex justify-center">
             <v-tooltip top>
@@ -134,7 +135,7 @@ export default {
           visibility: true,
           title: 'Ошибка',
           text:
-            'Произошла ошибка при получение данных, повтороите попытку позднее',
+            'Произошла ошибка при получении данных. Повтороите попытку позднее',
           okLabel: 'Ок'
         })
       })
@@ -150,14 +151,18 @@ export default {
         value: 'id',
         sortable: true
       },
-
       {
         text: 'Отправитель',
         value: 'user_id',
         align: 'center',
         sortable: true
       },
-
+      {
+        text: 'Тема',
+        value: 'theme',
+        align: 'center',
+        sortable: true
+      },
       {
         text: 'Email',
         value: 'email',

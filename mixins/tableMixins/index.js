@@ -79,13 +79,13 @@ export const tableMixins = {
             visibility: true,
             title: 'Ошибка',
             text:
-              'Произошла ошибка при получение данных, повтороите попытку позднее',
+              'Произошла ошибка при получении данных. Повтороите попытку позднее',
             okLabel: 'Ок'
           })
         })
     },
     prompt(payload, title, status, options = {}) {
-      const { form } = options
+      const { form, restore } = options
 
       this.$store.dispatch('dialog/setDialogParams', {
         visibility: true,
@@ -96,10 +96,32 @@ export const tableMixins = {
         form: form,
         okAction: async () => {
           this.$store.dispatch('dialog/setDialogParams', {})
-          await this.changeStatusApi(payload, status)
+          if (restore) {
+            const obj = payload.map(item => {
+              return item.id
+            })
+            await this.restoreApi(obj)
+          } else {
+            await this.changeStatusApi(payload, status)
+          }
           this.$store.dispatch('dialog/setReason', { reason: null })
         }
       })
+    },
+    async restoreApi(obj) {
+      this.loading = true
+      this.$axios
+        .post(`restore-${this.api}`, {
+          obj
+        })
+        .then(response => {
+          this.$store.dispatch('counter/loadCounter')
+          this.changeItemsStauts(response.data.obj)
+          this.loading = false
+        })
+        .catch(e => {
+          this.loading = false
+        })
     },
     async changeStatusApi(payload, status) {
       this.loading = true
@@ -140,13 +162,15 @@ export const tableMixins = {
           let itemToDelete = this.items.findIndex(item => {
             return Number(item.id) === Number(res)
           })
-
           this.items.splice(itemToDelete, 1)
         } catch (error) {}
       })
     },
     payloadStatusCreate(resources) {
-      return resources.map(item => {
+      const res = resources.filter($item => {
+        return $item.status !== 7
+      })
+      return res.map(item => {
         return item.id
       })
     },

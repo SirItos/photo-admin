@@ -57,7 +57,7 @@
       >
         <template
           v-slot:item.user.user_details.name="{ item }"
-        >{{item.user.user_details.name || 'Не указаноы'}}</template>
+        >{{item.user.user_details.name || 'Не указано'}}</template>
         <template
           v-slot:item.created_at="{ item }"
         >{{$moment(item.created_at).format('DD/MM/YYYY')}}</template>
@@ -156,7 +156,7 @@ export default {
           visibility: true,
           title: 'Ошибка',
           text:
-            'Произошла ошибка при получение данных, повтороите попытку позднее',
+            'Произошла ошибка при получении данных. Повтороите попытку позднее',
           okLabel: 'Ок'
         })
       })
@@ -232,6 +232,10 @@ export default {
       {
         text: 'Заблокировано',
         id: 6
+      },
+      {
+        text: 'Удалена пользователем',
+        id: 7
       }
     ]
   }),
@@ -264,7 +268,8 @@ export default {
               options: { form: true }
             }
           ]
-        : [
+        : status !== 7
+        ? [
             {
               label: 'Просмортреть',
               actions: 'check',
@@ -280,6 +285,14 @@ export default {
               actions: 'prompt',
               status: 3,
               options: { form: true }
+            }
+          ]
+        : [
+            {
+              label: 'Востановить',
+              actions: 'prompt',
+              status: 3,
+              options: { restore: true }
             }
           ]
     },

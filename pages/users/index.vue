@@ -94,6 +94,10 @@
       >
         <template v-slot:item.login="{ item }">{{item.login || formatPhone(item.phone) || '----'}}</template>
         <template v-slot:item.roles[0].name="{ item }">{{item.roles[0].name_ru}}</template>
+        <template v-slot:item.user_details.name="{item}">
+          {{
+          item.user_details ? item.user_details.name ? item.user_details.name : "Не указано" : "Не указано"}}
+        </template>
         <template v-slot:item.user_details.activated="{ item }">
           {{
           item.user_details ? item.user_details.activated ? 'Да' : "Нет" : '----'}}
@@ -199,7 +203,7 @@ export default {
           visibility: true,
           title: 'Ошибка',
           text:
-            'Произошла ошибка при получение данных, повтороите попытку позднее',
+            'Произошла ошибка при получении данных. Повтороите попытку позднее',
           okLabel: 'Ок'
         })
       })

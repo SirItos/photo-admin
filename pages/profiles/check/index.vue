@@ -8,12 +8,22 @@
           </v-btn>
         </div>
         <div xs="12" class="title">
-          {{item.title || 'Нет имени' }} :
+          {{item.user.user_details.name || 'Нет имени' }} :
           <b-table-status :status="item.statustitle.status_title" detail />
         </div>
         <v-spacer class="d-none d-sm-block"></v-spacer>
         <div>
-          <v-row class="justify-end pt-xs-2">
+          <v-row v-if="item.status === 7" class="justify-end pt-xs-2">
+            <v-col v-if="item.status !== 2 " xs="12">
+              <v-btn
+                @click="prompt(7,'Востановить',{restore:true})"
+                depressed
+                color="primary"
+                block
+              >Востановить</v-btn>
+            </v-col>
+          </v-row>
+          <v-row v-else class="justify-end pt-xs-2">
             <v-col v-if="item.status !== 2 " xs="12">
               <v-btn @click="prompt(2,'Активировать')" depressed color="primary" block>Актвировать</v-btn>
             </v-col>
@@ -69,7 +79,7 @@ export default {
         store.dispatch('dialog/setDialogParams', {
           visibility: true,
           title: 'Ошибка',
-          text: 'Произошла ошибка при получение данных',
+          text: 'Произошла ошибка при получении данных',
           okLabel: 'Ок'
         })
       })
@@ -79,7 +89,7 @@ export default {
   }),
   methods: {
     prompt(status, title, options = {}) {
-      const { form } = options
+      const { form, restore } = options
       this.$store.dispatch('dialog/setDialogParams', {
         visibility: true,
         title: `${title}?`,
@@ -89,10 +99,29 @@ export default {
         confirm: true,
         okAction: async () => {
           this.$store.dispatch('dialog/setDialogParams', {})
-          await this.activateApi(status)
+          if (restore) {
+            await this.restoreApi()
+          } else {
+            await this.activateApi(status)
+          }
           this.$store.dispatch('dialog/setReason', { reason: null })
         }
       })
+    },
+    async restoreApi() {
+      this.$store.dispatch('global/setOverlay', true)
+      this.$axios
+        .post(`restore-resources`, {
+          obj: [this.item.id]
+        })
+        .then(response => {
+          this.$store.dispatch('global/setOverlay', false)
+          this.$set(this.item, 'status', response.data.obj[0].status)
+          this.$set(this.item, 'statustitle', response.data.obj[0].statustitle)
+        })
+        .catch(e => {
+          this.$store.dispatch('global/setOverlay', false)
+        })
     },
     async activateApi(status) {
       this.$store.dispatch('global/setOverlay', true)

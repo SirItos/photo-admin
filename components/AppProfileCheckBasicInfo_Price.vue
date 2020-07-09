@@ -1,5 +1,20 @@
 <template>
-  <v-text-field :value="priceRange" label="Стоимость" readonly />
+  <v-select
+    readonly
+    multiple
+    :append-icon="null"
+    :value="priceId"
+    :items="optionsPriceRange"
+    chips
+    item-value="id"
+    item-text="value"
+    label="Оценка свидания"
+  >
+    <template></template>
+    <template v-slot:selection="{item}">
+      <v-chip @click:close="spliceSelected(item.id)" color="primary">{{item.value}}</v-chip>
+    </template>
+  </v-select>
 </template>
 
 <script>
@@ -13,32 +28,23 @@ export default {
   },
 
   computed: {
-    priceRange() {
-      if (!this.price[0] && !this.price[1]) {
-        return 'Не указана'
-      }
-      if (Number(this.price[0]) > 10000 && Number(this.price[0]) > 10000) {
-        return 'Вам не по карману'
-      }
-      if (this.price[0] === this.price[1]) {
-        return `${this.price[0]} `
-      }
-      if (this.price.length < 2) {
-        return `${this.price[0]} `
-      }
-      return this.startPrice + this.decim + this.endPrice
+    optionsPriceRange() {
+      return this.price.map(item => {
+        return {
+          id: item.id,
+          value: `${item.min_cost}  ${this.checkMaxValue(item.max_cost)}`
+        }
+      })
     },
-    startPrice() {
-      const startStr = Number(this.price[1]) > 10000 ? 'от ' : ''
-      return this.price[0] ? `${startStr} ${this.price[0]} ` : ''
-    },
-    endPrice() {
-      if (Number(this.price[1]) > 10000) return ''
-      const startStr = Number(!this.price[0]) ? 'до ' : ''
-      return this.price[1] ? `${startStr}${this.price[1]} ` : ''
-    },
-    decim() {
-      return this.price[0] && this.endPrice ? '- ' : ''
+    priceId() {
+      return this.price.map(item => {
+        return item.id
+      })
+    }
+  },
+  methods: {
+    checkMaxValue(value) {
+      return value >= 999999999 ? ' и более' : ` - ${value}`
     }
   }
 }
