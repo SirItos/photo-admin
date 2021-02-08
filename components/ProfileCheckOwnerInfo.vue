@@ -9,10 +9,18 @@
         <v-text-field label="Имя" readonly :value="item.user.user_details.name || 'Не указано'" />
       </v-col>-->
       <v-col sm="6" xs="12" v-if="item.user.user_details">
-        <v-text-field label="Email" readonly :value="item.user.user_details.email || 'Не указан'" />
+        <v-text-field
+          label="Email"
+          readonly
+          :value="item.user.user_details.email || 'Не указан'"
+        />
       </v-col>
       <v-col sm="6" xs="12" v-if="item.user.user_details">
-        <v-text-field label="Телефон" prefix="+7" readonly :value="item.user.phone || 'Не указан'" />
+        <v-text-field
+          label="Телефон"
+          readonly
+          :value="item.user.phone || 'Не указан'"
+        />
       </v-col>
     </v-row>
   </v-col>
@@ -30,5 +38,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

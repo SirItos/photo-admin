@@ -5,7 +5,7 @@ export default {
 
   head: {
     titleTemplate: '%s',
-    title: 'BazaBab - панель администратора',
+    title: 'BazaLove - панель администратора',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -19,6 +19,7 @@ export default {
   },
 
   router: {
+    base: '/admin/',
     middleware: 'auth'
   },
 
@@ -39,7 +40,7 @@ export default {
     baseURL:
       process.env.NODE_ENV === 'development'
         ? 'http://photo/api'
-        : 'https://back.bazabab.ru/api',
+        : 'https://bazalove.ru/back/public/api/',
     //http://photo/api
     progress: false
   },
@@ -56,6 +57,9 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+
+    extend(config, ctx) {
+      config.output.publicPath = '/admin/_nuxt/'
+    }
   }
 }

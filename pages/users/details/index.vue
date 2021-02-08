@@ -5,26 +5,25 @@
         <v-row class="px-4 pb-4 pt-10">
           <v-col cols="12" sm="6">
             <v-text-field
-              v-if="role.id === 3 || role.id ===4"
+              v-if="role.id === 3 || role.id === 4"
               v-model="phone"
               autocomplete="off"
-              prefix="+7"
               maxlength="10"
               label="Телефон"
-              :rules="[val => !!val || 'Укажите телефон']"
+              :rules="[(val) => !!val || 'Укажите телефон']"
             ></v-text-field>
             <v-text-field
               v-else
               v-model="login"
               label="Логин"
-              :rules="[val => !!val || 'Укажите Логин']"
+              :rules="[(val) => !!val || 'Укажите Логин']"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
             <v-text-field
               v-model="details.name"
               label="Имя"
-              :rules="[val => !!val || 'Укажите имя']"
+              :rules="[(val) => !!val || 'Укажите имя']"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -34,13 +33,24 @@
               type="tel"
               inputmode="numeric"
               autocomplete="0ff"
-              :hint="!$route.query.id ? `Минимум ${isAdmiOrManager ? 7 : 4} символов` : ''"
-              :maxlength="role ? role.id === 1 || role.id === 2 ? 7 : 4 : 7"
+              :hint="
+                !$route.query.id
+                  ? `Минимум ${isAdmiOrManager ? 7 : 4} символов`
+                  : ''
+              "
+              :maxlength="role ? (role.id === 1 || role.id === 2 ? 7 : 4) : 7"
               name="password"
-              :counter="role ? role.id === 1 || role.id === 2 ? 7 : 4 : 0"
+              :counter="role ? (role.id === 1 || role.id === 2 ? 7 : 4) : 0"
               :label="!$route.query.id ? 'Пароль' : 'Пароль (установить новый)'"
               :class="{ secure: !show }"
-              :rules="!$route.query.id ? [val => !!val || 'Укажите Пароль', rules.length(isAdmiOrManager ? 7 : 4 )] : []"
+              :rules="
+                !$route.query.id
+                  ? [
+                      (val) => !!val || 'Укажите Пароль',
+                      rules.length(isAdmiOrManager ? 7 : 4),
+                    ]
+                  : []
+              "
               @click:append="show = !show"
             ></v-text-field>
           </v-col>
@@ -48,7 +58,7 @@
             <v-text-field
               v-model="details.email"
               label="Email"
-              :rules="[val => !!val || 'Укажите  Email', rules.email_rules]"
+              :rules="[(val) => !!val || 'Укажите  Email', rules.email_rules]"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -61,24 +71,33 @@
               return-object
               item-text="text"
               item-value="id"
-              style="text-transform:capitalize"
-              :rules="[val => !!val.id || 'Укажите  Роль пользователя']"
+              style="text-transform: capitalize"
+              :rules="[(val) => !!val.id || 'Укажите  Роль пользователя']"
             ></v-select>
           </v-col>
           <v-col v-if="$route.query.id" cols="12" sm="6">
-            <v-checkbox :readonly="haveRights" label="Активирован" v-model="status"></v-checkbox>
+            <v-checkbox
+              :readonly="haveRights"
+              label="Активирован"
+              v-model="status"
+            ></v-checkbox>
           </v-col>
         </v-row>
       </v-form>
     </v-col>
     <div class="d-flex justify-end">
-      <v-btn @click="$router.back()" class="mr-2" large color="primary" depressed text>Назад</v-btn>
       <v-btn
-        @click="call"
+        @click="$router.back()"
+        class="mr-2"
         large
         color="primary"
         depressed
-      >{{$route.query.id ? "Сохранить" : 'Создать'}}</v-btn>
+        text
+        >Назад</v-btn
+      >
+      <v-btn @click="call" large color="primary" depressed>{{
+        $route.query.id ? 'Сохранить' : 'Создать'
+      }}</v-btn>
     </div>
   </v-row>
 </template>
@@ -92,16 +111,16 @@ export default {
         id: null,
         role: {
           id: null,
-          text: null
+          text: null,
         },
         details: {
           name: null,
-          email: null
+          email: null,
         },
         statustitle: null,
         status: true,
         phone: null,
-        login: null
+        login: null,
       }
     }
     return await $axios
@@ -114,16 +133,16 @@ export default {
           'statustitle',
           'phone',
           'login',
-          'status'
-        ]
+          'status',
+        ],
       })
-      .then(response => {
+      .then((response) => {
         return {
           id: response.data.id,
           role: {
             id: response.data.roles[0].id,
             text: response.data.roles[0].name_ru,
-            value: response.data.roles[0].name
+            value: response.data.roles[0].name,
           },
           details: {
             user_id: response.data.userDetails
@@ -143,12 +162,12 @@ export default {
               : null,
             online: response.data.userDetails
               ? response.data.userDetails.online
-              : null
+              : null,
           },
           statustitle: response.data.statustitle.status_title,
           status: response.data.status === 5,
           phone: response.data.phone,
-          login: response.data.login
+          login: response.data.login,
         }
       })
   },
@@ -159,23 +178,23 @@ export default {
     items: [],
     itemLoading: true,
     rules: {
-      length: len => v => {
+      length: (len) => (v) => {
         if (!v) return true
         return (
           v.length >= len || `Проль должен содержать минимум ${len} символов`
         )
       },
-      email_rules: value => {
+      email_rules: (value) => {
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         return pattern.test(value) || 'Некоректный email'
-      }
-    }
+      },
+    },
   }),
   computed: {
     availbRoleList() {
       return this.role.id === 1
         ? this.items
-        : this.items.filter(item => {
+        : this.items.filter((item) => {
             return item.id !== 1
           })
     },
@@ -186,7 +205,7 @@ export default {
     },
     isAdmiOrManager() {
       return this.role ? this.role.id === 1 || this.role.id === 2 : false
-    }
+    },
   },
   mounted() {
     this.$nextTick(() => {
@@ -207,22 +226,22 @@ export default {
               this.role.id === 1 || this.role.id === 2
                 ? this.login
                 : this.phone,
-            password: this.password
+            password: this.password,
           })
-          .then(response => {
+          .then((response) => {
             this.$store.dispatch('global/setOverlay', false)
             if (this.id === this.$store.state.user.id) {
               this.$store.dispatch('user/updageName', response.data)
             }
             this.$router.back()
           })
-          .catch(e => {
+          .catch((e) => {
             this.$store.dispatch('global/setOverlay', false)
             this.$store.dispatch('dialog/setDialogParams', {
               visibility: true,
               title: 'Ошибка',
               text: 'Произошла ошибка',
-              okLabel: 'Ок'
+              okLabel: 'Ок',
             })
           })
       }
@@ -230,23 +249,22 @@ export default {
     loadRoleList() {
       this.$axios
         .get('role-list')
-        .then(response => {
-          this.items = response.data.map(row => {
+        .then((response) => {
+          this.items = response.data.map((row) => {
             return {
               id: row.id,
               text: row.name_ru,
-              value: row.name
+              value: row.name,
             }
           })
           this.itemLoading = false
         })
-        .catch(e => {
+        .catch((e) => {
           this.itemLoading = false
         })
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -33,14 +33,21 @@
                   @click:append="show = !show"
                   :rules="[v => !!v || 'Введите пароль']"
                   :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="show ? 'text': 'password'"
+                  :type="show ? 'text' : 'password'"
                   prepend-inner-icon="mdi-lock"
                   color="primary"
                   label="Пароль"
                 />
               </v-card-text>
               <v-card-actions class="d-flex justify-center pb-6">
-                <v-btn type="submit" :disabled="loading" large width="250" color="primary">Войти</v-btn>
+                <v-btn
+                  type="submit"
+                  :disabled="loading"
+                  large
+                  width="250"
+                  color="primary"
+                  >Войти</v-btn
+                >
               </v-card-actions>
             </div>
             <div
@@ -48,8 +55,15 @@
               key="loading"
               class="px-6 py-12 d-flex flex-wrap justify-center align-center"
             >
-              <v-progress-circular :size="86" color="primary" width="7" indeterminate></v-progress-circular>
-              <div style="width:100%" class="py-3 text-center">{{loadingMessage}}</div>
+              <v-progress-circular
+                :size="86"
+                color="primary"
+                width="7"
+                indeterminate
+              ></v-progress-circular>
+              <div style="width:100%" class="py-3 text-center">
+                {{ loadingMessage }}
+              </div>
             </div>
           </v-fade-transition>
         </v-form>
@@ -109,5 +123,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
