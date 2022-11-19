@@ -14,7 +14,7 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
     "cookie-universal-nuxt": "^2.1.1",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.15.8",
     "vue-gallery": "^2.0.1",
     "vue-picture-swipe": "^1.2.0"
   },
